@@ -1,10 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 🔹 Conectar con los searchParams
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get("q") || "");
 
   // Cerrar el menú desplegable cuando se hace clic fuera
   useEffect(() => {
@@ -15,52 +22,87 @@ export default function Header() {
     }
 
     if (isModalOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isModalOpen]);
+
+  // 🔹 Debounce para la búsqueda en vivo
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500); // Esperar 500ms después de que el usuario deje de escribir
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // 🔹 Sincronizar input cuando cambie la URL (solo desde navegación externa)
+  useEffect(() => {
+    const urlQuery = searchParams.get("q") || "";
+    setQuery(urlQuery);
+    setDebouncedQuery(urlQuery);
+  }, [searchParams]);
+
+  // 🔹 Actualizar URL cuando cambie el query con debounce (solo si estamos en /docs)
+  useEffect(() => {
+    if (location.pathname === '/docs') {
+      const currentQuery = searchParams.get("q") || "";
+      if (debouncedQuery !== currentQuery) {
+        if (debouncedQuery.trim()) {
+          setSearchParams({ q: debouncedQuery });
+        } else {
+          setSearchParams({});
+        }
+      }
+    }
+  }, [debouncedQuery, location.pathname, setSearchParams, searchParams]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Si ya estamos en la página de documentos, solo actualizar los parámetros
+    if (location.pathname === '/docs') {
+      if (query) {
+        setSearchParams({ q: query });
+      } else {
+        setSearchParams({});
+      }
+    } else {
+      // Si estamos en otra página, navegar a documentos con la búsqueda
+      if (query) {
+        navigate(`/docs?q=${encodeURIComponent(query)}`);
+      } else {
+        navigate('/docs');
+      }
+    }
+  };
 
   return (
     <header className="bg-[#0a1a2f] text-white px-6 py-3 flex items-center justify-between shadow-md">
       {/* Izquierda: Logo + Navegación */}
       <div className="flex items-center space-x-8">
         <div className="flex items-center space-x-4">
-          
-          <img
-            src="/logo.png"
-            alt="DocsFlow Logo"
-            className="w-18 h-16"
-          />
-          
-          <Link to="/" className="font-bold text-lg">
-            DocsFlow
-          </Link>
-         
+          <img src="/logo.png" alt="DocsFlow Logo" className="w-18 h-16" />
+          <Link to="/" className="font-bold text-lg">DocsFlow</Link>
         </div>
         <nav className="hidden md:flex space-x-8">
-          <Link to="#" className="hover:underline">
-            dashboard
-          </Link>
-          <Link to="/upload" className="hover:underline">
-            upload
-          </Link>
-          <Link to="#" className="hover:underline">
-            documentos
-          </Link>
+          <Link to="#" className="hover:underline">dashboard</Link>
+          <Link to="/upload" className="hover:underline">upload</Link>
+          <Link to="/docs" className="hover:underline">documentos</Link>
         </nav>
       </div>
 
       {/* Centro: Barra de búsqueda */}
-      <div className="flex-grow max-w-md px-6">
+      <form onSubmit={handleSearch} className="flex-grow max-w-md px-6">
         <input
           type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar documentos..."
           className="w-full px-3 py-2 rounded-md bg-gray-800 text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
-      </div>
+      </form>
+
 
       {/* Derecha: Perfil con menú */}
       <div className="relative" ref={dropdownRef}>
@@ -68,11 +110,7 @@ export default function Header() {
           onClick={() => setIsModalOpen(!isModalOpen)}
           className="flex items-center space-x-2 focus:outline-none"
         >
-          <img
-            src="https://ui-avatars.com/api/?name=User+Test&background=0D8ABC&color=fff"
-            alt="Perfil"
-            className="w-9 h-9 rounded-full"
-          />
+        
           <span className="hidden md:block">Usuario</span>
           <svg
             className="w-4 h-4"

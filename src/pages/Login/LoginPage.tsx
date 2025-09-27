@@ -5,8 +5,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import LoginForm from '../../components/auth/LoginForm';
 import type { LoginFormData } from '../../components/auth/LoginForm';
 
-const LoginPage: React.FC = () => {
-  const { login, error, clearError, isLoading, isAuthenticated } = useAuth();
+const LoginPage: React.FC = () => { 
+  const { login, error, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Redirigir si ya está autenticado

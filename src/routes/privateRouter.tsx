@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function PrivateRoute({ children }: Props) {
-  const isAuthenticated = false; // prueba cambiando a true
+  const isAuthenticated = true; // prueba cambiando a true
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }

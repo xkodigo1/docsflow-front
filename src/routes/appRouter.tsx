@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/layout";
 import DocsPage from "../pages/paginaPrincipal";
+import DocsListPage from "../pages/docsList"; // Página que conecta con la base de datos
 import PrivacidadPage from "../pages/footer/privacidad";
 import SoportePage from "../pages/footer/soporte";
 import LoginPage from '../pages/Login/LoginPage';
@@ -15,7 +16,7 @@ export default function AppRouter() {
       {/* Rutas con Layout como wrapper */}
       <Route path="/" element={<Layout />}>
         {/*<Route index element={<DocsPage />} />*/}
-        <Route path="docs" element={<DocsPage />} />
+        <Route path="docs" element={<DocsListPage />} /> 
         <Route path="upload" element={<DocsPage />} />
         <Route path="login" element={<LoginPage />} />
       <Route path="forgot-password" element={<ForgotPasswordPage />} />
@@ -35,6 +36,8 @@ export default function AppRouter() {
     </Routes>
   );
 }
+
+
 
 
 
