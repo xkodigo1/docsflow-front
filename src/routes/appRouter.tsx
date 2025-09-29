@@ -86,16 +86,6 @@ export default function AppRouter() {
         } 
       />
 
-      {/* Redirección para rutas de auth si ya está autenticado */}
-      <Route 
-        path="/" 
-        element={
-          isAuthenticated ? 
-            <Navigate to="/app" replace /> : 
-            <Navigate to="/login" replace />
-        } 
-      />
-
       {/* Página 404 */}
       <Route 
         path="*" 
