@@ -1,8 +1,9 @@
 export interface User {
     id: number;
-    email: string;
-    name: string;
-    role?: string;
+    role: string;
+    department_id: number | null;
+    email?: string;  // Opcional por ahora
+    name?: string;   // Opcional por ahora
     createdAt?: string;
 }
 
@@ -35,10 +36,4 @@ export interface ForgotPasswordData {
     token: string;
     password: string;
     confirmPassword: string;
-  }
-  
-  export interface AuthResponse {
-    user: User;
-    token: string;
-    message?: string;
   }

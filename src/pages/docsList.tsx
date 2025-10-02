@@ -26,6 +26,7 @@ const getFileTypeColor = (type: string | undefined): string => {
 
 export default function DocsListPage() {
   const [searchParams] = useSearchParams();
+  const currentQuery = searchParams.get("q") || "";
   
   // Usar nuestro hook personalizado para conectar con la base de datos
   const {
@@ -44,22 +45,22 @@ export default function DocsListPage() {
   useEffect(() => {
     const query = searchParams.get("q") || "";
     
+    console.log('Búsqueda activada:', { query }); // Debug
+    
     // Solo ejecutar si hay un cambio real en la query
     if (query.trim()) {
       searchDocuments(query);
     } else {
       fetchDocuments();
     }
-  }, [searchParams.get("q")]); // Solo depende del valor de la query, no del objeto completo
+  }, [searchParams.get("q")]); // Solo la query para evitar loops
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       {/* Título */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-4">Documentos</h1>
-        <p className="text-gray-600">Usa la barra de búsqueda en el header para buscar documentos</p>
       </div>
-
       {/* Estado de carga */}
       {loading && (
         <div className="flex justify-center items-center py-8">

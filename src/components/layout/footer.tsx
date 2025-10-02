@@ -9,13 +9,10 @@ export default function Footer() {
   
           {/* Links rápidos */}
           <div className="flex space-x-20 mt-2 md:mt-0">
-            <Link to="#" className="hover:text-white text-sm">
-              Documentación
-            </Link>
-            <Link to="/soporte" className="hover:text-white text-sm">
+            <Link to="soporte" className="hover:text-white text-sm">
               Soporte
             </Link>
-            <Link to="/privacidad" className="hover:text-white text-sm">
+            <Link to="privacidad" className="hover:text-white text-sm">
               Privacidad
             </Link>
           </div>

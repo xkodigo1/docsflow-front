@@ -1,66 +1,95 @@
-import React from 'react';import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { useDocuments } from "../../hooks/useDocuments";
+import { Link} from "react-router-dom";
+
 
 const Dashboard: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+  // 👇 usamos el hook pero solo pedimos 5
+  const { documents, fetchDocuments, loading, error } = useDocuments({
+    autoFetch: false, // no cargar de inmediato
+    initialParams: { limit: 100, page: 1 }
+  });
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login', { replace: true });
-    };
+ 
+  useEffect(() => {
+    fetchDocuments({ limit: 100, page: 1 });
+  }, []);
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
-                            <h1 className="text-2xl font-bold text-gray-900">DocsFlow</h1>
-                            <nav className="ml-8 flex space-x-4">
-                                <a href="#" className="text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                                <a href="#" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Documentos</a>
-                                <a href="#" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Compartidos</a>
-                            </nav>
-                        </div>
+  return (
+    <div className="min-h-screen bg-gray-50 px-6 py-8">
+      {/* Bienvenida */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Bienvenido</h1>
+        <p className="mt-2 text-gray-600">
+          Aquí podrás gestionar tus documentos, ver estadísticas y acceder a tus funciones rápidas.
+        </p>
+      </div>
 
-                        <div className="flex items-center space-x-4">
-                            <span className="text-gray-700">Hola, {user?.name}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
-                            >
-                                Cerrar sesión
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <div className="px-4 py-6 sm:px-0">
-                    <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 p-8">
-                        <div className="text-center">
-                            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h3 className="mt-4 text-lg font-medium text-gray-900">Bienvenido a tu Dashboard</h3>
-                            <p className="mt-2 text-sm text-gray-500">
-                                Comienza a gestionar tus documentos desde el menú de navegación.
-                            </p>
-                            <div className="mt-6">
-                                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    Crear nuevo documento
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+      {/* Tarjetas de resumen */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="p-6 bg-white shadow rounded-xl">
+          <h2 className="text-sm font-medium text-gray-500">Documentos Subidos</h2>
+          <p className="mt-2 text-2xl font-bold text-gray-900">128</p>
         </div>
-    );
+        <div className="p-6 bg-white shadow rounded-xl">
+          <h2 className="text-sm font-medium text-gray-500">En Revisión</h2>
+          <p className="mt-2 text-2xl font-bold text-yellow-600">12</p>
+        </div>
+        <div className="p-6 bg-white shadow rounded-xl">
+          <h2 className="text-sm font-medium text-gray-500">Aprobados</h2>
+          <p className="mt-2 text-2xl font-bold text-green-600">95</p>
+        </div>
+      </div>
+       {/* Acciones rápidas */}
+       <div className="bg-white shadow rounded-xl p-6 mb-8">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Acciones rápidas</h2>
+          <div className="flex space-x-4">
+            <Link to="/app/upload" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              Subir documento
+            </Link>
+            <Link to="/app/docs" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              ver documentos
+            </Link>
+          </div>
+        </div>
+      {/* Últimos documentos */}
+      <div className="bg-white shadow rounded-xl p-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Últimos documentos</h2>
+
+        {loading && <p className="text-gray-500">Cargando...</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
+
+        {!loading && documents.length === 0 && (
+          <p className="text-gray-500">No hay documentos recientes</p>
+        )}
+
+        {documents.length > 0 && (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {documents.map((doc) => (
+                <tr key={doc.id}>
+                  <td className="px-4 py-2">{doc.title}</td>
+                  <td className="px-4 py-2 capitalize">
+                    {doc.status || "pendiente"}
+                  </td>
+                  <td className="px-4 py-2">
+                    {new Date(doc.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

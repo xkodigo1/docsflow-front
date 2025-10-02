@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/layout/layout";
 import DocsPage from "../pages/paginaPrincipal";
+import DocsListPage from "../pages/docsList";
 import PrivacidadPage from "../pages/footer/privacidad";
 import SoportePage from "../pages/footer/soporte";
 import LoginPage from '../pages/Login/LoginPage';
@@ -44,6 +45,7 @@ export default function AppRouter() {
       />
       
       <Route 
+
         path="/reset-password/:token" 
         element={
           <PublicRoute>
@@ -63,8 +65,9 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DocsPage />} />
-        <Route path="docs" element={<DocsPage />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="docs" element={<DocsListPage />} />
+        <Route path="upload" element={<DocsPage />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="privacidad" element={<PrivacidadPage />} />
         <Route path="soporte" element={<SoportePage />} />

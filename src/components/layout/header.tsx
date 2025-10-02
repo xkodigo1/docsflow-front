@@ -1,7 +1,10 @@
 import { Link, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+
 
 export default function Header() {
+  const { logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -27,11 +30,11 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isModalOpen]);
 
-  // 🔹 Debounce para la búsqueda en vivo
+  // 🔹 Debounce para la búsqueda en vivo (más rápido para mejor UX)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-    }, 500); // Esperar 500ms después de que el usuario deje de escribir
+    }, 300); // Reducido a 300ms para búsqueda más rápida
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -43,9 +46,9 @@ export default function Header() {
     setDebouncedQuery(urlQuery);
   }, [searchParams]);
 
-  // 🔹 Actualizar URL cuando cambie el query con debounce (solo si estamos en /docs)
+  // 🔹 Actualizar URL cuando cambie el query con debounce (solo si estamos en /app/docs)
   useEffect(() => {
-    if (location.pathname === '/docs') {
+    if (location.pathname === '/app/docs') {
       const currentQuery = searchParams.get("q") || "";
       if (debouncedQuery !== currentQuery) {
         if (debouncedQuery.trim()) {
@@ -61,7 +64,7 @@ export default function Header() {
     e.preventDefault();
     
     // Si ya estamos en la página de documentos, solo actualizar los parámetros
-    if (location.pathname === '/docs') {
+    if (location.pathname === '/app/docs') {
       if (query) {
         setSearchParams({ q: query });
       } else {
@@ -70,9 +73,9 @@ export default function Header() {
     } else {
       // Si estamos en otra página, navegar a documentos con la búsqueda
       if (query) {
-        navigate(`/docs?q=${encodeURIComponent(query)}`);
+        navigate(`/app/docs?q=${encodeURIComponent(query)}`);
       } else {
-        navigate('/docs');
+        navigate('/app/docs');
       }
     }
   };
@@ -86,9 +89,8 @@ export default function Header() {
           <Link to="/" className="font-bold text-lg">DocsFlow</Link>
         </div>
         <nav className="hidden md:flex space-x-8">
-          <Link to="#" className="hover:underline">dashboard</Link>
-          <Link to="/upload" className="hover:underline">upload</Link>
-          <Link to="/docs" className="hover:underline">documentos</Link>
+          <Link to="/app/docs" className="hover:underline">Documentos</Link>
+          <Link to="/app/upload" className="hover:underline">Subir</Link>
         </nav>
       </div>
 
@@ -135,6 +137,7 @@ export default function Header() {
               onClick={() => {
                 setIsModalOpen(false);
                 setIsOpen(true);
+                
               }}
             >
               Cerrar sesión
@@ -164,11 +167,13 @@ export default function Header() {
                       >
                         Cancelar
                       </button>
+                      
                       <button
                         onClick={() => {
                           setIsOpen(false);
-                          // Aquí puedes agregar la lógica de cerrar sesión
-                          console.log('Cerrando sesión...');
+                          logout();
+                          navigate('/login');
+                          
                         }}
                         className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                       >

@@ -43,7 +43,7 @@ export default function FileUpload() {
       const files = Array.from(e.target.files);
       setSelectedFiles(files);
       if (files.length === 1) {
-        // Para un solo archivo, usar su nombre como título por defecto
+        // Para el archivo, usar su nombre como título por defecto
         setMetadata(prev => ({ ...prev, title: files[0].name.replace(/\.[^/.]+$/, "") }));
       }
       setShowMetadataForm(true);
@@ -258,7 +258,7 @@ export default function FileUpload() {
               ✓ Archivos subidos exitosamente ({getSuccessfulUploads().length})
             </h3>
             <button
-              onClick={() => navigate('/docs')}
+              onClick={() => navigate('/app/docs')}
               className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm"
             >
               Ver documentos

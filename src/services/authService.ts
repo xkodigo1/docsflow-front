@@ -34,17 +34,32 @@ api.interceptors.response.use(
 
 export const authService = {
     async login(credentials: LoginData): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/auth/login', credentials);
-
-        if (response.data.token) {
-            localStorage.setItem('authToken', response.data.token);
+        // El backend devuelve {access_token, token_type, expires_in}
+        const response = await api.post('/auth/login', credentials);
+        const { access_token, token_type } = response.data;
+        
+        if (access_token) {
+            localStorage.setItem('authToken', access_token);
+            
+            // Obtener información del usuario después del login exitoso
+            const userResponse = await api.get('/users/me', {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`
+                }
+            });
+            
+            return {
+                user: userResponse.data,
+                token: access_token,
+                message: 'Login exitoso'
+            };
         }
-
-        return response.data;
+        
+        throw new Error('Token no recibido del servidor');
     },
 
     async getCurrentUser(): Promise<User> {
-        const response = await api.get<User>('/auth/me');
+        const response = await api.get<User>('/users/me');
         return response.data;
     },
 
