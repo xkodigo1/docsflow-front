@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { userService } from '../services/userService';
 import type { User } from '../services/userService';
 import { useAuth } from '../contexts/AuthContext';
+import UserRegistrationForm from '../components/auth/UserRegistrationForm';
 
 const UsersPage: React.FC = () => {
   const { user: currentUser } = useAuth();
@@ -9,6 +10,7 @@ const UsersPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filterRole, setFilterRole] = useState('operador');
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -29,6 +31,11 @@ const UsersPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRegistrationSuccess = () => {
+    setShowRegistrationForm(false);
+    loadUsers(); // Recargar la lista de usuarios
   };
 
   const formatDate = (dateString: string) => {
@@ -91,9 +98,17 @@ const UsersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
-        <p className="text-gray-600">Gestiona los usuarios del sistema</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
+          <p className="text-gray-600">Gestiona los usuarios del sistema</p>
+        </div>
+        <button
+          onClick={() => setShowRegistrationForm(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          + Nuevo Usuario
+        </button>
       </div>
 
       {/* Filters */}
@@ -174,6 +189,18 @@ const UsersPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Registration Form Modal */}
+      {showRegistrationForm && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <UserRegistrationForm
+              onSuccess={handleRegistrationSuccess}
+              onCancel={() => setShowRegistrationForm(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
