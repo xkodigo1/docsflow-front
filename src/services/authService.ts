@@ -1,103 +1,36 @@
-// src/services/authService.ts
-import axios from 'axios';
-import type { LoginData, AuthResponse, User } from '../types/auth';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-
-const api = axios.create({
-    baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Interceptor para requests
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-// Interceptor para responses
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
+import api from './api';
+import type { LoginData, AuthResponse } from '../types/auth';
 
 export const authService = {
-    async login(credentials: LoginData): Promise<AuthResponse> {
-        // El backend devuelve {access_token, token_type, expires_in}
-        const response = await api.post('/auth/login', credentials);
-        const { access_token, token_type } = response.data;
-        
-        if (access_token) {
-            localStorage.setItem('authToken', access_token);
-            
-            // Obtener información del usuario después del login exitoso
-            const userResponse = await api.get('/users/me', {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`
-                }
-            });
-            
-            return {
-                user: userResponse.data,
-                token: access_token,
-                message: 'Login exitoso'
-            };
-        }
-        
-        throw new Error('Token no recibido del servidor');
-    },
+  async login(credentials: LoginData): Promise<AuthResponse> {
+    const response = await api.post('/login', credentials);
+    const data = response.data;
+    
+    // El backend devuelve access_token, pero el frontend espera token
+    return {
+      user: {
+        id: 0, // Se obtendrá del token
+        email: credentials.email,
+        role: 'operador' as const,
+        department_id: undefined,
+        is_blocked: false,
+        failed_attempts: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      token: data.access_token,
+      message: 'Login exitoso'
+    };
+  },
 
-    async getCurrentUser(): Promise<User> {
-        const response = await api.get<User>('/users/me');
-        return response.data;
-    },
+  async getCurrentUser() {
+    const response = await api.get('/users/me');
+    return response.data;
+  },
 
-    async logout(): Promise<void> {
-        localStorage.removeItem('authToken');
-        delete api.defaults.headers.Authorization;
-    },
-
-    async validateToken(): Promise<boolean> {
-        try {
-            const token = localStorage.getItem('authToken');
-            if (!token) return false;
-
-            await this.getCurrentUser();
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
+  async logout() {
+    // En el backend no hay endpoint de logout, solo removemos el token local
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
 };
-
-export const authServicePassword = {
-  
-    async forgotPassword(email: string): Promise<{ message: string }> {
-      const response = await api.post<{ message: string }>('/auth/forgot-password', { email });
-      return response.data;
-    },
-  
-    async resetPassword(token: string, password: string): Promise<{ message: string }> {
-      const response = await api.post<{ message: string }>('/auth/reset-password', { 
-        token, 
-        password 
-      });
-      return response.data;
-    },
-  
-    async validateResetToken(token: string): Promise<{ valid: boolean; email?: string }> {
-      const response = await api.get<{ valid: boolean; email?: string }>(`/auth/validate-reset-token/${token}`);
-      return response.data;
-    }
-  };

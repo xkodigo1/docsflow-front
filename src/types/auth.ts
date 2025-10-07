@@ -1,10 +1,14 @@
 export interface User {
     id: number;
-    role: string;
-    department_id: number | null;
-    email?: string;  // Opcional por ahora
-    name?: string;   // Opcional por ahora
-    createdAt?: string;
+    email: string;
+    role: 'admin' | 'operador';
+    department_id?: number;
+    is_blocked: boolean;
+    failed_attempts: number;
+    created_at: string;
+    updated_at: string;
+    blocked_at?: string;
+    unblocked_at?: string;
 }
 
 export interface LoginData {

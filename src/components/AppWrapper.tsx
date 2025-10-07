@@ -1,15 +1,15 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Layout from '../components/layout/Layout';
-import ProtectedRoute from '../components/layout/ProtectedRoute';
+import Layout from './layout/Layout';
+import ProtectedRoute from './layout/ProtectedRoute';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
 import DocumentsPage from '../pages/DocumentsPage';
 import TablesPage from '../pages/TablesPage';
 import UsersPage from '../pages/UsersPage';
 
-const AppRouter: React.FC = () => {
+const AppWrapper: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -53,5 +53,4 @@ const AppRouter: React.FC = () => {
   );
 };
 
-export default AppRouter;
-
+export default AppWrapper;

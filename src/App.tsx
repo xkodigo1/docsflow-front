@@ -1,5 +1,5 @@
-import AppRouter from "./routes/appRouter";
+import AppWrapper from "./components/AppWrapper";
 
 export default function App() {
-  return <AppRouter />;
+  return <AppWrapper />;
 }

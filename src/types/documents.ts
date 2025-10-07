@@ -1,39 +1,35 @@
 // Tipos para documentos y otros datos de la base de datos
 export interface Document {
     id: number;
-    title: string;
-    content?: string;
-    type?: string;
-    status: 'draft' | 'published' | 'archived';
-    userId: number;
-    createdAt: string;
-    updatedAt: string;
-    tags?: string[];
-    fileUrl?: string;
-    fileName?: string;
-    fileSize?: number;
+    filename: string;
+    department_id: number;
+    status: 'pending' | 'processing' | 'processed' | 'error';
+    filepath: string;
+    uploaded_by: number;
+    uploaded_at: string;
+    processed_at?: string;
+    last_attempt_at?: string;
+    error_message?: string;
+    document_type?: string;
 }
 
-export interface CreateDocumentData {
-    title: string;
-    content?: string;
-    type?: string;
-    tags?: string[];
+export interface DocumentUploadData {
+    file: File;
+    department_id?: number;
+    document_type?: string;
 }
 
-export interface UpdateDocumentData {
-    title?: string;
-    content?: string;
-    type?: string;
-    status?: 'draft' | 'published' | 'archived';
-    tags?: string[];
+export interface DocumentSearchParams {
+    limit?: number;
+    offset?: number;
+    department_id?: number;
+    document_type?: string;
 }
 
 export interface DocumentsResponse {
-    documents: Document[];
-    total: number;
-    page: number;
+    items: Document[];
     limit: number;
+    offset: number;
 }
 
 export interface ApiResponse<T> {
