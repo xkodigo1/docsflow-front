@@ -39,7 +39,6 @@ const TablesPage: React.FC = () => {
         offset: 0,
       });
       
-      console.log('Response from backend:', response);
       setDebugResponse(response);
       
       // Verificar que la respuesta tenga la estructura esperada
@@ -135,7 +134,6 @@ const TablesPage: React.FC = () => {
   const applyFilters = () => {
     // Esta función aplicaría los filtros a los resultados
     // Por ahora, solo actualizamos el estado
-    console.log('Aplicando filtros:', filters);
   };
 
   return (
