@@ -1,12 +1,16 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Layout from './layout/Layout';
+import Layout from './layout/layout';
 import ProtectedRoute from './layout/ProtectedRoute';
 import LoginPage from '../pages/LoginPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import DashboardPage from '../pages/DashboardPage';
+import UserDashboardPage from '../pages/UserDashboardPage';
+import MyDocumentsPage from '../pages/MyDocumentsPage';
+import MyTablesPage from '../pages/MyTablesPage';
+import UploadDocumentsPage from '../pages/UploadDocumentsPage';
 import DocumentsPage from '../pages/DocumentsPage';
 import TablesPage from '../pages/TablesPage';
 import UsersPage from '../pages/UsersPage';
@@ -45,7 +49,12 @@ const AppWrapper: React.FC = () => {
           <Layout />
         </ProtectedRoute>
       }>
-        <Route index element={<DashboardPage />} />
+        <Route index element={<DocumentsPage />} />
+        <Route path="admin-dashboard" element={<DashboardPage />} />
+        <Route path="my-dashboard" element={<UserDashboardPage />} />
+        <Route path="my-documents" element={<MyDocumentsPage />} />
+        <Route path="my-tables" element={<MyTablesPage />} />
+        <Route path="upload-documents" element={<UploadDocumentsPage />} />
         <Route path="documents" element={<DocumentsPage />} />
         <Route path="tables" element={<TablesPage />} />
         <Route 

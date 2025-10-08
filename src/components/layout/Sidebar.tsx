@@ -13,16 +13,46 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
   const navigation = [
     {
-      name: 'Documentos',
+      name: 'Todos los Documentos',
       href: '/documents',
       icon: '📄',
+      roles: ['admin']
+    },
+    {
+      name: 'Mis Documentos',
+      href: '/my-documents',
+      icon: '📁',
+      roles: ['operador']
+    },
+    {
+      name: 'Subir Documentos',
+      href: '/upload-documents',
+      icon: '📤',
+      roles: ['operador']
+    },
+    {
+      name: 'Todas las Tablas',
+      href: '/tables',
+      icon: '📊',
+      roles: ['admin']
+    },
+    {
+      name: 'Mis Tablas',
+      href: '/my-tables',
+      icon: '📋',
+      roles: ['operador']
+    },
+    {
+      name: 'Mi Dashboard',
+      href: '/my-dashboard',
+      icon: '🏠',
       roles: ['admin', 'operador']
     },
     {
-      name: 'Tablas',
-      href: '/tables',
-      icon: '📊',
-      roles: ['admin', 'operador']
+      name: 'Dashboard Admin',
+      href: '/admin-dashboard',
+      icon: '📈',
+      roles: ['admin']
     },
     {
       name: 'Usuarios',
