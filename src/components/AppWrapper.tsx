@@ -4,10 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import Layout from './layout/Layout';
 import ProtectedRoute from './layout/ProtectedRoute';
 import LoginPage from '../pages/LoginPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
 import DashboardPage from '../pages/DashboardPage';
 import DocumentsPage from '../pages/DocumentsPage';
 import TablesPage from '../pages/TablesPage';
 import UsersPage from '../pages/UsersPage';
+import DepartmentsPage from '../pages/DepartmentsPage';
 
 const AppWrapper: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,6 +30,14 @@ const AppWrapper: React.FC = () => {
         path="/login" 
         element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} 
       />
+      <Route 
+        path="/forgot-password" 
+        element={isAuthenticated ? <Navigate to="/" replace /> : <ForgotPasswordPage />} 
+      />
+      <Route 
+        path="/reset-password" 
+        element={isAuthenticated ? <Navigate to="/" replace /> : <ResetPasswordPage />} 
+      />
       
       {/* Protected routes */}
       <Route path="/" element={
@@ -42,6 +53,14 @@ const AppWrapper: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="admin">
               <UsersPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="departments" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <DepartmentsPage />
             </ProtectedRoute>
           } 
         />
