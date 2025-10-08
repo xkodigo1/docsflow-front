@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User, LoginData, AuthContextType } from '../types/auth';
 import { authService } from '../services/authService';
+import { useToast } from '../hooks/useToast';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,6 +14,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showSuccess, showWarning, showInfo } = useToast();
 
   const isAuthenticated = !!user;
 
@@ -32,6 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Token inválido, limpiar datos
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            showWarning('Sesión expirada. Por favor, inicia sesión nuevamente.');
           }
         }
       } catch (error) {
@@ -55,6 +58,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
+      
+      // Mensaje de bienvenida con fallback
+      const userName = response.user?.email || 'Usuario';
+      showSuccess(`¡Bienvenido, ${userName}!`);
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 'Error al iniciar sesión';
       setError(errorMessage);
@@ -68,6 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authService.logout();
     setUser(null);
     setError(null);
+    showInfo('Sesión cerrada correctamente.');
   };
 
   const clearError = () => {

@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { userRegistrationService } from '../../services/userRegistrationService';
 import type { UserRegistrationData } from '../../services/userRegistrationService';
+import { useToast } from '../../hooks/useToast';
 
 const registrationSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -26,6 +27,7 @@ interface UserRegistrationFormProps {
 const UserRegistrationForm: React.FC<UserRegistrationFormProps> = ({ onSuccess, onCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showSuccess, showError } = useToast();
 
   const {
     register,
@@ -51,10 +53,12 @@ const UserRegistrationForm: React.FC<UserRegistrationFormProps> = ({ onSuccess, 
       };
 
       await userRegistrationService.registerUser(registrationData);
+      showSuccess(`Usuario ${data.email} registrado correctamente`);
       onSuccess();
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 'Error al registrar usuario';
       setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }

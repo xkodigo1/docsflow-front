@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { passwordRecoveryService } from '../../services/passwordRecoveryService';
+import { useToast } from '../../hooks/useToast';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Email inválido').min(1, 'Email es requerido'),
@@ -18,6 +19,7 @@ interface ForgotPasswordFormProps {
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSuccess, onBack }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { showSuccess, showError } = useToast();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -36,6 +38,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSuccess, onBa
 
       await passwordRecoveryService.forgotPassword(data.email);
       setMessage('Si el email existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.');
+      showSuccess('Solicitud enviada. Revisa tu correo electrónico.');
       
       if (onSuccess) {
         setTimeout(() => onSuccess(), 2000);
@@ -44,6 +47,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSuccess, onBa
       console.error('Error requesting password reset:', error);
       const errorMessage = error.response?.data?.detail || error.message || 'Error al solicitar recuperación de contraseña';
       setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }

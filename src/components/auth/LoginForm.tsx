@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useToast } from '../../hooks/useToast';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 const loginSchema = z.object({
@@ -17,6 +18,7 @@ const LoginForm: React.FC = () => {
   const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showError } = useToast();
   
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -50,8 +52,9 @@ const LoginForm: React.FC = () => {
       await login(data);
       const from = location.state?.from?.pathname || '/documents';
       navigate(from, { replace: true });
-    } catch (error) {
-      // El error ya se maneja en el contexto
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || 'Error al iniciar sesión';
+      showError(errorMessage);
     }
   };
 

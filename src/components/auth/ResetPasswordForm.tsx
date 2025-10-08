@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { passwordRecoveryService } from '../../services/passwordRecoveryService';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../hooks/useToast';
 
 const resetPasswordSchema = z.object({
   new_password: z.string()
@@ -26,6 +27,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
 
   const {
     register,
@@ -43,6 +45,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
 
       await passwordRecoveryService.resetPassword(token, data.new_password);
       setMessage('Contraseña actualizada exitosamente. Redirigiendo al login...');
+      showSuccess('Contraseña restablecida correctamente');
       
       setTimeout(() => {
         navigate('/login');
@@ -51,6 +54,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
       console.error('Error resetting password:', error);
       const errorMessage = error.response?.data?.detail || error.message || 'Error al restablecer la contraseña';
       setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
