@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ForgotPasswordForm from './ForgotPasswordForm';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -18,6 +19,7 @@ const LoginForm: React.FC = () => {
   const location = useLocation();
   
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const {
     register,
@@ -52,6 +54,15 @@ const LoginForm: React.FC = () => {
       // El error ya se maneja en el contexto
     }
   };
+
+  if (showForgotPassword) {
+    return (
+      <ForgotPasswordForm 
+        onSuccess={() => setShowForgotPassword(false)}
+        onBack={() => setShowForgotPassword(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -137,13 +148,24 @@ const LoginForm: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              ¿No tienes cuenta?{' '}
-              <span className="text-blue-600 hover:text-blue-500 cursor-pointer">
-                Contacta al administrador
-              </span>
-            </p>
+          <div className="text-center space-y-2">
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-blue-600 hover:text-blue-500 text-sm font-medium"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">
+                ¿No tienes cuenta?{' '}
+                <span className="text-blue-600 hover:text-blue-500 cursor-pointer">
+                  Contacta al administrador
+                </span>
+              </p>
+            </div>
           </div>
         </form>
       </div>
