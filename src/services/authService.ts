@@ -3,22 +3,19 @@ import type { LoginData, AuthResponse } from '../types/auth';
 
 export const authService = {
   async login(credentials: LoginData): Promise<AuthResponse> {
-    const response = await api.post('/login', credentials);
+    const response = await api.post('/auth/login', credentials);
     const data = response.data;
     
-    // El backend devuelve access_token, pero el frontend espera token
+    // Guardar el token temporalmente para obtener la información del usuario
+    const tempToken = data.access_token;
+    localStorage.setItem('token', tempToken);
+    
+    // Obtener la información real del usuario
+    const user = await this.getCurrentUser();
+    
     return {
-      user: {
-        id: 0, // Se obtendrá del token
-        email: credentials.email,
-        role: 'operador' as const,
-        department_id: undefined,
-        is_blocked: false,
-        failed_attempts: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      token: data.access_token,
+      user,
+      token: tempToken,
       message: 'Login exitoso'
     };
   },
