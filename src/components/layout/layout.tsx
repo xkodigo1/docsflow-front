@@ -1,7 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './Header';
+import Header from './header';
 import Sidebar from './Sidebar';
+import QuickNotifications from '../notifications/QuickNotifications';
 
 const Layout: React.FC = () => {
   return (
@@ -16,13 +17,16 @@ const Layout: React.FC = () => {
 
         {/* Page content */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-          <div className="container mx-auto px-4 py-6">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+        <div className="container mx-auto px-4 py-6">
+          <Outlet />
+        </div>
+      </main>
+      
+      {/* Notificaciones rápidas */}
+      <QuickNotifications />
     </div>
-  );
+  </div>
+);
 };
 
 export default Layout;
