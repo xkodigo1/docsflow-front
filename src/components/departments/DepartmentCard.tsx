@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { Department } from '../../services/departmentService';
 import { departmentService } from '../../services/departmentService';
+import DepartmentTablesModal from './DepartmentTablesModal';
+import DepartmentUsersModal from './DepartmentUsersModal';
+import DepartmentDocumentsModal from './DepartmentDocumentsModal';
 
 interface DepartmentCardProps {
   department: Department;
@@ -23,6 +26,9 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
   const [showActions, setShowActions] = useState(false);
   const [stats, setStats] = useState<DepartmentStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [showTablesModal, setShowTablesModal] = useState(false);
+  const [showUsersModal, setShowUsersModal] = useState(false);
+  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -108,7 +114,11 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
 
           {/* Estadísticas reales */}
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="text-center p-2 bg-gray-50 rounded">
+            <div 
+              className="text-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={() => setShowUsersModal(true)}
+              title="Ver usuarios del departamento"
+            >
               <div className="text-lg font-semibold text-gray-900">
                 {isLoadingStats ? (
                   <div className="animate-pulse bg-gray-300 h-5 w-8 mx-auto rounded"></div>
@@ -118,7 +128,11 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
               </div>
               <div className="text-xs text-gray-500">Usuarios</div>
             </div>
-            <div className="text-center p-2 bg-gray-50 rounded">
+            <div 
+              className="text-center p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={() => setShowDocumentsModal(true)}
+              title="Ver documentos del departamento"
+            >
               <div className="text-lg font-semibold text-gray-900">
                 {isLoadingStats ? (
                   <div className="animate-pulse bg-gray-300 h-5 w-8 mx-auto rounded"></div>
@@ -132,14 +146,12 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
 
           {/* Estadísticas adicionales */}
           {stats && !isLoadingStats && (
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="text-center p-2 bg-blue-50 rounded">
-                <div className="text-sm font-semibold text-blue-900">
-                  {stats.processedDocuments}
-                </div>
-                <div className="text-xs text-blue-600">Procesados</div>
-              </div>
-              <div className="text-center p-2 bg-green-50 rounded">
+            <div className="grid grid-cols-1 gap-3 text-sm">
+              <div 
+                className="text-center p-2 bg-green-50 rounded cursor-pointer hover:bg-green-100 transition-colors"
+                onClick={() => setShowTablesModal(true)}
+                title="Ver tablas del departamento"
+              >
                 <div className="text-sm font-semibold text-green-900">
                   {stats.extractedTables}
                 </div>
@@ -157,6 +169,36 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
           <span>ID: {department.id}</span>
         </div>
       </div>
+
+      {/* Modal de tablas */}
+      {showTablesModal && (
+        <DepartmentTablesModal
+          isOpen={showTablesModal}
+          onClose={() => setShowTablesModal(false)}
+          departmentId={department.id}
+          departmentName={department.name}
+        />
+      )}
+
+      {/* Modal de usuarios */}
+      {showUsersModal && (
+        <DepartmentUsersModal
+          isOpen={showUsersModal}
+          onClose={() => setShowUsersModal(false)}
+          departmentId={department.id}
+          departmentName={department.name}
+        />
+      )}
+
+      {/* Modal de documentos */}
+      {showDocumentsModal && (
+        <DepartmentDocumentsModal
+          isOpen={showDocumentsModal}
+          onClose={() => setShowDocumentsModal(false)}
+          departmentId={department.id}
+          departmentName={department.name}
+        />
+      )}
     </div>
   );
 };
