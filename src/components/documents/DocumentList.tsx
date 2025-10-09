@@ -24,8 +24,9 @@ const DocumentList: React.FC = () => {
       limit: 20,
       offset: currentPage * 20,
       document_type: filterType || undefined,
+      status: filterStatus || undefined,
     });
-  }, [currentPage, filterType]);
+  }, [currentPage, filterType, filterStatus]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +35,7 @@ const DocumentList: React.FC = () => {
         limit: 20,
         offset: 0,
         document_type: filterType || undefined,
+        status: filterStatus || undefined,
       });
       setCurrentPage(0);
     } else {
@@ -41,6 +43,7 @@ const DocumentList: React.FC = () => {
         limit: 20,
         offset: 0,
         document_type: filterType || undefined,
+        status: filterStatus || undefined,
       });
     }
   };

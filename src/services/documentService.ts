@@ -25,6 +25,7 @@ export interface DocumentSearchParams {
   offset?: number;
   department_id?: number;
   document_type?: string;
+  status?: string;
 }
 
 export interface DocumentSearchQuery {
