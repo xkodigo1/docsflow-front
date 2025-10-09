@@ -59,15 +59,6 @@ const QuickNotifications: React.FC = () => {
           }
         });
 
-        // Notificación de bienvenida para nuevos usuarios
-        if (myDocuments.length === 0) {
-          newNotifications.push({
-            id: 9999,
-            type: 'info',
-            message: '👋 ¡Bienvenido! Sube tu primer documento para comenzar',
-            timestamp: new Date().toISOString()
-          });
-        }
 
         setNotifications(newNotifications.slice(0, 3)); // Máximo 3 notificaciones
         setIsVisible(newNotifications.length > 0);
