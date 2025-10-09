@@ -14,6 +14,7 @@ export interface TableSearchResult {
     department_id: number;
     uploaded_at: string;
     status: string;
+    uploaded_by: number;
   };
   table: {
     id: number;
@@ -47,8 +48,25 @@ export const tableService = {
     return response.data;
   },
 
+  async getMyTables(params: { q?: string; limit?: number; offset?: number } = {}): Promise<TableSearchResponse> {
+    const response = await api.get('/tables/my-tables', { params });
+    return response.data;
+  },
+
+  async downloadMyTables(): Promise<Blob> {
+    const response = await api.get('/tables/my-tables/download', {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
   async getTablesByDocument(documentId: number): Promise<TablesByDocumentResponse> {
     const response = await api.get(`/tables/${documentId}`);
+    return response.data;
+  },
+
+  async getTableById(tableId: number): Promise<any> {
+    const response = await api.get(`/tables/table/${tableId}`);
     return response.data;
   },
 
