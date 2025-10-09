@@ -31,10 +31,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       roles: ['operador']
     },
     {
-      name: 'Todas las Tablas',
-      href: '/tables',
-      icon: '📊',
-      roles: ['admin']
+      name: 'Procesar Documentos',
+      href: '/process-documents',
+      icon: '⚙️',
+      roles: ['operador']
     },
     {
       name: 'Mis Tablas',
@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       name: 'Mi Dashboard',
       href: '/my-dashboard',
       icon: '🏠',
-      roles: ['admin', 'operador']
+      roles: ['operador']
     },
     {
       name: 'Dashboard Admin',
@@ -126,6 +126,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 <p className="text-xs text-gray-500 capitalize">
                   {user?.role}
                 </p>
+                {user?.role === 'operador' && user?.department_name && (
+                  <p className="text-xs text-blue-600 font-medium">
+                    {user.department_name}
+                  </p>
+                )}
               </div>
             </div>
           </div>

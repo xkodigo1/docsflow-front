@@ -354,7 +354,7 @@ const DashboardPage: React.FC = () => {
       {/* Quick actions */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Acciones Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <a
             href="/documents"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -377,16 +377,6 @@ const DashboardPage: React.FC = () => {
             </div>
           </a>
 
-          <a
-            href="/tables"
-            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <span className="text-2xl mr-3">📊</span>
-            <div>
-              <p className="font-medium text-gray-900">Buscar Tablas</p>
-              <p className="text-sm text-gray-500">Contenido extraído</p>
-            </div>
-          </a>
 
           {user?.role === 'admin' && (
             <a

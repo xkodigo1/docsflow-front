@@ -3,7 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { documentService } from '../services/documentService';
 import { useToast } from '../hooks/useToast';
 import { Link } from 'react-router-dom';
-import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
+import { CloudArrowUpIcon, CogIcon } from '@heroicons/react/24/outline';
+import DocumentProcessor from '../components/documents/DocumentProcessor';
 
 interface MyDocument {
   id: number;
@@ -100,15 +101,55 @@ const MyDocumentsPage: React.FC = () => {
               Gestiona únicamente los documentos que has subido al sistema
             </p>
           </div>
-          <Link
-            to="/upload-documents"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <CloudArrowUpIcon className="h-5 w-5 mr-2" />
-            Subir Documentos
-          </Link>
+          <div className="flex space-x-3">
+            <Link
+              to="/process-documents"
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <CogIcon className="h-5 w-5 mr-2" />
+              Procesar Documentos
+            </Link>
+            <Link
+              to="/upload-documents"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <CloudArrowUpIcon className="h-5 w-5 mr-2" />
+              Subir Documentos
+            </Link>
+          </div>
         </div>
       </div>
+
+      {/* Procesador de documentos */}
+      <DocumentProcessor 
+        documents={documents}
+        onProcessingComplete={async () => {
+          // Recargar documentos después del procesamiento
+          if (!user?.id) return;
+          try {
+            setIsLoading(true);
+            const response = await documentService.getDocuments({
+              limit: 50,
+              offset: 0
+            });
+            
+            let myDocuments = response.items.filter((doc: any) => 
+              doc.uploaded_by === user.id
+            );
+            
+            if (filter !== 'all') {
+              myDocuments = myDocuments.filter((doc: any) => doc.status === filter);
+            }
+            
+            setDocuments(myDocuments);
+          } catch (error: any) {
+            console.error('Error loading my documents:', error);
+            showError('Error al cargar tus documentos');
+          } finally {
+            setIsLoading(false);
+          }
+        }}
+      />
 
       {/* Filtros rápidos */}
       <div className="bg-white p-4 rounded-lg shadow">
