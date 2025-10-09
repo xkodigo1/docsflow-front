@@ -3,6 +3,7 @@ export interface User {
     email: string;
     role: 'admin' | 'operador';
     department_id?: number;
+    department_name?: string;
     is_blocked: boolean;
     failed_attempts: number;
     created_at: string;
