@@ -104,4 +104,9 @@ export const documentService = {
     const response = await api.get(`/documents/${id}/status`);
     return response.data;
   },
+
+  async processMultipleDocuments(ids: number[]): Promise<{ message: string; processed: number; failed: number }> {
+    const response = await api.post('/documents/process-multiple', { document_ids: ids });
+    return response.data;
+  },
 };
