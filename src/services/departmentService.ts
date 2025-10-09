@@ -39,7 +39,13 @@ export const departmentService = {
   },
 
   // Eliminar un departamento
-  async deleteDepartment(id: number): Promise<{ message: string }> {
+  async deleteDepartment(id: number): Promise<{
+    message: string;
+    department_name: string;
+    deleted_users: number;
+    deleted_documents: number;
+    deleted_tables: number;
+  }> {
     const response = await api.delete(`/departments/${id}`);
     return response.data;
   },

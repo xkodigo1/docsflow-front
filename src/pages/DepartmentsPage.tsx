@@ -4,6 +4,7 @@ import { departmentService, type Department } from '../services/departmentServic
 import DepartmentForm from '../components/departments/DepartmentForm';
 import DepartmentCard from '../components/departments/DepartmentCard';
 import DepartmentStats from '../components/departments/DepartmentStats';
+import DeleteDepartmentModal from '../components/departments/DeleteDepartmentModal';
 
 const DepartmentsPage: React.FC = () => {
   const { user } = useAuth();
@@ -14,6 +15,15 @@ const DepartmentsPage: React.FC = () => {
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'id'>('name');
+  
+  // Estados para el modal de eliminación
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
+  const [deleteStats, setDeleteStats] = useState({
+    userCount: 0,
+    documentCount: 0,
+    tableCount: 0
+  });
 
   // Verificar que el usuario sea admin
   if (user?.role !== 'admin') {
@@ -71,17 +81,63 @@ const DepartmentsPage: React.FC = () => {
   };
 
   const handleDeleteDepartment = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este departamento?')) {
-      return;
-    }
+    const department = departments.find(dept => dept.id === id);
+    if (!department) return;
 
     try {
-      await departmentService.deleteDepartment(id);
-      setDepartments(prev => prev.filter(dept => dept.id !== id));
+      // Obtener estadísticas del departamento antes de mostrar el modal
+      const stats = await departmentService.getDepartmentDetailedStats(id);
+      setDeleteStats({
+        userCount: stats.userCount || 0,
+        documentCount: stats.documentCount || 0,
+        tableCount: stats.extractedTables || 0
+      });
+      
+      setDepartmentToDelete(department);
+      setIsDeleteModalOpen(true);
+    } catch (error: any) {
+      console.error('Error loading department stats:', error);
+      // Si no se pueden cargar las estadísticas, mostrar el modal con valores por defecto
+      setDeleteStats({
+        userCount: 0,
+        documentCount: 0,
+        tableCount: 0
+      });
+      setDepartmentToDelete(department);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDeleteDepartment = async () => {
+    if (!departmentToDelete) return;
+
+    try {
+      const result = await departmentService.deleteDepartment(departmentToDelete.id);
+      
+      // Mostrar mensaje de éxito con detalles
+      const successMessage = `Departamento "${result.department_name}" eliminado exitosamente. Se eliminaron: ${result.deleted_users} usuarios, ${result.deleted_documents} documentos y ${result.deleted_tables} tablas.`;
+      
+      // Actualizar la lista de departamentos
+      setDepartments(prev => prev.filter(dept => dept.id !== departmentToDelete.id));
+      setError(null);
+      
+      // Cerrar modal
+      setIsDeleteModalOpen(false);
+      setDepartmentToDelete(null);
+      
+      // Mostrar mensaje de éxito (opcional)
+      console.log(successMessage);
+      
     } catch (error: any) {
       console.error('Error deleting department:', error);
-      setError('Error al eliminar el departamento');
+      const errorMessage = error.response?.data?.detail || error.message || 'Error al eliminar el departamento';
+      setError(errorMessage);
     }
+  };
+
+  const cancelDeleteDepartment = () => {
+    setIsDeleteModalOpen(false);
+    setDepartmentToDelete(null);
   };
 
   const handleEditDepartment = (department: Department) => {
@@ -228,6 +284,20 @@ const DepartmentsPage: React.FC = () => {
               handleCreateDepartment
             }
             onClose={handleCloseForm}
+          />
+        )}
+
+        {/* Modal de eliminación */}
+        {departmentToDelete && (
+          <DeleteDepartmentModal
+            isOpen={isDeleteModalOpen}
+            onClose={cancelDeleteDepartment}
+            onConfirm={confirmDeleteDepartment}
+            departmentName={departmentToDelete.name}
+            departmentId={departmentToDelete.id}
+            userCount={deleteStats.userCount}
+            documentCount={deleteStats.documentCount}
+            tableCount={deleteStats.tableCount}
           />
         )}
     </div>
