@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { userService } from '../services/userService';
 import { documentService } from '../services/documentService';
+import { departmentService } from '../services/departmentService';
 import DocumentsStatusChart from '../components/dashboard/DocumentsStatusChart';
 import UsersRoleChart from '../components/dashboard/UsersRoleChart';
 import TrendsChart from '../components/dashboard/TrendsChart';
@@ -40,14 +41,31 @@ const DashboardPage: React.FC = () => {
       setIsRefreshing(true);
       setError(null);
       
-        // Cargar datos reales del backend
-        const [usersResponse, documentsResponse] = await Promise.all([
-          userService.getUsers({ limit: 100 }),
-          documentService.getDocuments({ limit: 100 })
-        ]);
+      // Preparar parámetros de filtro
+      const documentParams: any = { limit: 100 };
+      if (filters.departmentId) {
+        documentParams.department_id = parseInt(filters.departmentId);
+      }
+      
+      // Cargar datos reales del backend con filtros
+      const [usersResponse, documentsResponse] = await Promise.all([
+        userService.getUsers({ limit: 100 }),
+        documentService.getDocuments(documentParams)
+      ]);
       
       const users = usersResponse.items || [];
-      const documents = documentsResponse.items || [];
+      let documents = documentsResponse.items || [];
+      
+      // Aplicar filtro de fechas si está configurado
+      if (filters.startDate && filters.endDate) {
+        const startDate = new Date(filters.startDate);
+        const endDate = new Date(filters.endDate);
+        
+        documents = documents.filter((doc: any) => {
+          const docDate = new Date(doc.uploaded_at);
+          return docDate >= startDate && docDate <= endDate;
+        });
+      }
       
       // Calcular estadísticas reales
       const totalUsers = users.length;
@@ -121,9 +139,9 @@ const DashboardPage: React.FC = () => {
       
       trends.push({
         date: dateStr,
-        documents: dayDocuments || Math.floor(Math.random() * 10) + 1,
-        processed: dayProcessed || Math.floor(Math.random() * 8) + 1,
-        users: dayUsers || Math.floor(Math.random() * 3) + 1,
+        documents: dayDocuments,
+        processed: dayProcessed,
+        users: dayUsers,
       });
     }
     
@@ -133,15 +151,12 @@ const DashboardPage: React.FC = () => {
   // Función para cargar departamentos
   const loadDepartments = async () => {
     try {
-      // Por ahora, usar datos simulados hasta que tengamos el endpoint de departamentos
-      setDepartments([
-        { id: 1, name: 'Administración' },
-        { id: 2, name: 'Contabilidad' },
-        { id: 3, name: 'Recursos Humanos' },
-        { id: 4, name: 'Ventas' }
-      ]);
+      const departmentsData = await departmentService.getDepartments();
+      setDepartments(departmentsData);
     } catch (error) {
       console.error('Error loading departments:', error);
+      // Fallback a datos vacíos si hay error
+      setDepartments([]);
     }
   };
 
