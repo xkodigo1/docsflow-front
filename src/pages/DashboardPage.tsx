@@ -7,6 +7,7 @@ import DocumentsStatusChart from '../components/dashboard/DocumentsStatusChart';
 import UsersRoleChart from '../components/dashboard/UsersRoleChart';
 import TrendsChart from '../components/dashboard/TrendsChart';
 import DashboardFilters from '../components/dashboard/DashboardFilters';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -29,9 +30,10 @@ const DashboardPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [filters, setFilters] = useState({
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 días atrás
-    endDate: new Date().toISOString().split('T')[0], // hoy
+    startDate: '', // Sin filtro de fecha por defecto
+    endDate: '', // Sin filtro de fecha por defecto
     departmentId: ''
   });
   const [departments, setDepartments] = useState<Array<{ id: number; name: string }>>([]);
@@ -71,6 +73,7 @@ const DashboardPage: React.FC = () => {
       const totalUsers = users.length;
       const totalDocuments = documents.length;
       
+      
       const documentsByStatus = {
         pending: documents.filter((doc: any) => doc.status === 'pending').length,
         processing: documents.filter((doc: any) => doc.status === 'processing').length,
@@ -105,6 +108,10 @@ const DashboardPage: React.FC = () => {
         recentUsers,
         trendsData,
       });
+      
+      // Registrar la última actualización
+      setLastUpdated(new Date());
+      
     } catch (error: any) {
       console.error('Error loading stats:', error);
       const errorMessage = error.response?.data?.detail || error.message || 'Error desconocido';
@@ -180,10 +187,42 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     loadStats();
     loadDepartments();
+  }, [filters]);
+
+  // Actualizar estadísticas cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadStats();
+    }, 30000); // 30 segundos
+
+    return () => clearInterval(interval);
   }, [filters]); // Recargar cuando cambien los filtros
 
   return (
     <div className="space-y-6">
+      {/* Header con botón de actualización */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard Administrativo</h1>
+          <p className="text-gray-600">
+            Estadísticas y métricas del sistema
+            {lastUpdated && (
+              <span className="ml-2 text-sm text-gray-500">
+                • Última actualización: {lastUpdated.toLocaleTimeString('es-ES')}
+              </span>
+            )}
+          </p>
+        </div>
+        <button
+          onClick={loadStats}
+          disabled={isRefreshing}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ArrowPathIcon className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'Actualizando...' : 'Actualizar'}
+        </button>
+      </div>
+
       {/* Filters */}
       <DashboardFilters
         onDateRangeChange={handleDateRangeChange}

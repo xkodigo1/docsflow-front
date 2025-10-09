@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './header';
 import Sidebar from './Sidebar';
-import QuickNotifications from '../notifications/QuickNotifications';
 
 const Layout: React.FC = () => {
   return (
@@ -21,9 +20,6 @@ const Layout: React.FC = () => {
           <Outlet />
         </div>
       </main>
-      
-      {/* Notificaciones rápidas */}
-      <QuickNotifications />
     </div>
   </div>
 );

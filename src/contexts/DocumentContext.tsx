@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Document, DocumentSearchParams } from '../types/documents';
 import { documentService } from '../services/documentService';
+import { useToast } from '../hooks/useToast';
 
 interface DocumentContextType {
   documents: Document[];
@@ -29,6 +30,7 @@ interface DocumentProviderProps {
 }
 
 export const DocumentProvider: React.FC<DocumentProviderProps> = ({ children }) => {
+  const { showSuccess, showError, showInfo } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -130,7 +132,7 @@ export const DocumentProvider: React.FC<DocumentProviderProps> = ({ children }) 
       setIsLoading(true);
       setError(null);
       
-      await documentService.processDocument(id);
+      const result = await documentService.processDocument(id);
       
       // Actualizar el estado del documento
       setDocuments(prev => prev.map(doc => 
@@ -138,9 +140,17 @@ export const DocumentProvider: React.FC<DocumentProviderProps> = ({ children }) 
           ? { ...doc, status: 'processing' as const }
           : doc
       ));
+
+      // Mostrar notificación de éxito
+      showSuccess(result.message || 'Documento procesado exitosamente');
+      
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 'Error al procesar documento';
       setError(errorMessage);
+      
+      // Mostrar notificación de error
+      showError(`Error al procesar documento: ${errorMessage}`);
+      
       throw error;
     } finally {
       setIsLoading(false);
@@ -160,9 +170,17 @@ export const DocumentProvider: React.FC<DocumentProviderProps> = ({ children }) 
           ? { ...doc, status: 'pending' as const, processed_at: undefined }
           : doc
       ));
+
+      // Mostrar notificación de éxito
+      showInfo('Documento marcado para reprocesar');
+      
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 'Error al reprocesar documento';
       setError(errorMessage);
+      
+      // Mostrar notificación de error
+      showError(`Error al reprocesar documento: ${errorMessage}`);
+      
       throw error;
     } finally {
       setIsLoading(false);

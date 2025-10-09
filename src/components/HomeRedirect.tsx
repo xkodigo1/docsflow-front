@@ -16,7 +16,7 @@ const HomeRedirect: React.FC = () => {
 
   // Redirigir según el rol del usuario
   if (user?.role === 'admin') {
-    return <Navigate to="/documents" replace />;
+    return <Navigate to="/admin-dashboard" replace />;
   } else if (user?.role === 'operador') {
     return <Navigate to="/my-documents" replace />;
   }
